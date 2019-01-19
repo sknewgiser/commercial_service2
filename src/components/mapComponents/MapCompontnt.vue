@@ -37,17 +37,31 @@
                     rotate: 0 //旋转角度
                 }
             });
-            //https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png
             let tileLayer = new G.Layer.Tile('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                 cluster: ['a', 'b', 'c']
             });
             tileLayer.addTo(this.map);
+            
 
-            this.graphicLayer = new G.Layer.Graphic();
-            this.graphicLayer.addTo(this.map);
+            // 聚类
+            // this.graphicLayer = new G.Layer.Graphic();
+            // this.graphicLayer.addTo(this.map);
+            // this.graphicLayer.bringToTop();
+            // this.graphicLayer.addListener('graphicClicked', this.onGraphicClicked);
 
 
-            this.graphicLayer.addListener('graphicClicked', this.onGraphicClicked);
+            // this.clusterLayer = new G.Layer.Cluster({
+            //     clusterClickable: true,
+            //     pointClickable: true,
+            //     breakValues: [3, 5, 10]
+            // });
+            // this.clusterLayer.addTo(this.map);
+            // this.clusterLayer.addListener('clusterClicked', this.onClusterClicked);		
+            // this.map.redraw();
+
+
+
+            // 边界
             const AK = 'MjdiNzliMDYxZTY4NGM5MWI5YjNkYzUyYWE1YjRlMjk';
             var SITE_CLUSTER = ['s1', 's2', 's3', 's4', 's5', 's6', 's7', 's8'];
             const Config_JZ = [
@@ -96,7 +110,6 @@
                     }
                 }
             ];
-            // console.log('http://geohey.com/s/dataviz/config?ak=MjdiNzliMDYxZTY4NGM5MWI5YjNkYzUyYWE1YjRlMjk' + JSON.stringify(Config_JZ))
             axios.get('http://geohey.com/s/dataviz/config?ak=MjdiNzliMDYxZTY4NGM5MWI5YjNkYzUyYWE1YjRlMjk&configJson=' + escape(JSON.stringify(Config_JZ)))
                 .then(res=>{
                     const url = "http://geohey.com/s/dataviz/" + res.data.data.vizId
@@ -107,44 +120,10 @@
                     });
                     LinesCacheLayer.addTo(this.map);
                     this.graphicLayer.bringToTop();
-
                 })
                 .catch(err=>{
                     console.log(err)
                 })
-
-
-               //  let clusterLayer = new G.Graphic.Cluster({
-               //     clusterClickable: true,
-               //     pointClickable: true,
-               //     breakValues: [3, 5, 10]
-               // });
-               // clusterLayer.addTo(this.map);
-            //
-            //        clusterLayer.bind('clusterClicked', onClusterClicked);
-            //
-            //        function onClusterClicked(e) {
-            //            var c = e.cluster;
-            //            clusterLayer.diveIn(c);
-            //        }
-
-            // let addPoint = function(x, y){
-            //     var g = new G.Graphic.Point([x, y], null, {
-            //         shape: 'circle',
-            //         size: [12],
-            //         fillColor: '#333',
-            //         fillOpacity: 1.0
-            //     });
-            //     clusterLayer.addPoint(g);
-            // }
-            //
-            // for (var i = 0; i < 100; i++) {
-            //     addPoint(-2e7 + 4e7 * Math.random(), -2e7 + 4e7 * Math.random());
-            // }
-
-            //  this.map.redraw();
-
-
 
         },
         created: function () {
@@ -164,6 +143,7 @@
                     clickable: true
                 });
                 g.addTo(this.graphicLayer, r.id, true);
+                // this.clusterLayer.addPoint(g);
             },
             onGraphicClicked(e) {
                 let g = e.graphic;
