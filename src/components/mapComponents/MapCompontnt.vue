@@ -10,6 +10,12 @@
                 </div>
             </div>
         </div>
+        <div class="map-position">
+            <div class="map-position-bg"></div>
+        </div>
+        <div class="map-basemap">
+            <van-icon name="bars" size="24px" />
+        </div>
         <div id="map">
 
         </div>
@@ -41,7 +47,7 @@
                 cluster: ['a', 'b', 'c']
             });
             tileLayer.addTo(this.map);
-            
+
 
             // 聚类
             // this.graphicLayer = new G.Layer.Graphic();
@@ -58,7 +64,6 @@
             // this.clusterLayer.addTo(this.map);
             // this.clusterLayer.addListener('clusterClicked', this.onClusterClicked);		
             // this.map.redraw();
-
 
 
             // 边界
@@ -111,7 +116,7 @@
                 }
             ];
             axios.get('http://geohey.com/s/dataviz/config?ak=MjdiNzliMDYxZTY4NGM5MWI5YjNkYzUyYWE1YjRlMjk&configJson=' + escape(JSON.stringify(Config_JZ)))
-                .then(res=>{
+                .then(res => {
                     const url = "http://geohey.com/s/dataviz/" + res.data.data.vizId
                         + '/{z}/{x}/{y}.png?ak=' + AK + '&retina=@2x&useCache=false';
                     let LinesCacheLayer = new G.Layer.Tile(url, {
@@ -121,7 +126,7 @@
                     LinesCacheLayer.addTo(this.map);
                     this.graphicLayer.bringToTop();
                 })
-                .catch(err=>{
+                .catch(err => {
                     console.log(err)
                 })
 
@@ -217,7 +222,7 @@
                 category: 1,
                 pageIndex: 0,
                 distance: 2000,
-                showAttrs: [           //'商圈','蔬菜零售点','综合服务体','便利店'
+                showAttrs: [           //'商圈','蔬菜零售终端','综合体购物中心','便利店'
                     [['名称', 'name'], ['类别', 'ctype']],
                     [['名称', 'name'], ['类别', 'ctype']],
                     [['名称', 'name'], ['类别', 'ctype']],
@@ -225,12 +230,15 @@
                 ]
             };
         }
-
     }
 
 </script>
 
-<style scoped>
+<style scoped lang="scss">
+    $iconWidth: 36px;
+    $iconHeight: 36px;
+    $borderRadius:4px;
+    $boxShadow:0 0 5px rgba(0, 0, 0, .2);
     #map {
         background: #233;
         height: 100%;
@@ -240,13 +248,11 @@
         right: 0;
         bottom: 0;
     }
-
     .map-box {
         position: relative;
         height: calc(100% - 1rem);
         overflow: hidden;
     }
-
     .map-tool {
         position: absolute;
         left: 10px;
@@ -254,34 +260,68 @@
         z-index: 1;
 
     }
-
     .zoom {
         background: #fff;
-        width: 26px;
-        height: 26px;
-        box-shadow: 1px 2px 1px rgba(0, 0, 0, .15);
+        width: 36px;
+        height: 36px;
+        box-shadow: $boxShadow;
         cursor: pointer;
         overflow: hidden;
-        margin-top: 5px;
+        margin-top: 10px;
+        border-radius: $borderRadius;
     }
-
     .zoom-in-icon, .zoom-out-icon {
         background-image: url("../../assets/images/mapZoom2x.png");
         width: 10px;
         height: 10px;
-        margin: 6px auto;
+        margin: 12px auto;
         background-size: cover;
     }
-
     .zoom-in-icon {
         background-position: 0 0;
     }
-
     .zoom-out-icon {
         background-position: -10px 2px;
     }
-
     .map-box /deep/ .g-popup-content-wrapper {
         width: 42.5vw;
+    }
+    .map-box /deep/ .van-pagination__item, .map-box /deep/ .van-pagination__page-desc {
+        height: 0.8rem;
+        line-height: 0.8rem;
+    }
+    .map-position {
+        position: absolute;
+        left: 10px;
+        bottom: 60px;
+        width: $iconWidth;
+        height: $iconHeight;
+        z-index: 1;
+        border-radius: $borderRadius;
+        box-shadow: $boxShadow;
+        background-color: #fff;
+    }
+    .map-position-bg {
+        background-image: url("../../assets/images/map-icons.png"); /*  图片宽高比   1 ： 3   */
+        background-position: 0 0;
+        background-size: 26px 78px;
+        background-repeat: no-repeat;
+        width: 26px;
+        height: 26px;
+        margin: 5px auto;
+    }
+    .map-basemap {
+        position: absolute;
+        right: 10px;
+        bottom: 60px;
+        z-index: 1;
+        background: #fff;
+        width: $iconWidth;
+        height: $iconHeight;
+        border-radius: $borderRadius;
+        box-shadow: $boxShadow;
+        text-align: center;
+        padding: 6px 0;
+        box-sizing: border-box;
     }
 </style>

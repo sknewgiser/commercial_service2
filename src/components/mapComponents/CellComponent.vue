@@ -26,8 +26,10 @@
             />
         </div>
         <div v-show="pageBusiness.length<=0" class="nodata-tip">
-            <van-icon name="fail" size="1rem"/>
-            <p>当前暂无数据</p>
+            <div class="nodata-tip-vertical">
+                <van-icon name="fail" size="1rem"/>
+                <p class="nodata-tip-p">当前暂无数据</p>
+            </div>
         </div>
         <div class="c-name">清华同衡技术创新中心&nbsp;&nbsp; &nbsp;  </div>
     </div>
@@ -89,6 +91,7 @@
         width: 100%;
         position: absolute;
         bottom: 0;
+        z-index: 2;
         &-item {
             height: 0.8rem;
             border-bottom: 1px solid rgba(170, 170, 170, 0.7);
@@ -136,7 +139,10 @@
         height: 4.8rem;
         background: #eee;
         text-align: center;
-        > p {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        &-p {
             color: #aaa;
         }
     }
@@ -146,7 +152,7 @@
         background: #fff;
         color: #ccc;
     }
-    .cell /deep/ .van-pagination>{
+    .cell /deep/ .van-pagination__item,.cell /deep/ .van-pagination__page-desc{
         line-height: 0.8rem;
         height: 0.8rem;
     }
@@ -185,5 +191,6 @@
         background: rgba(255,255,255,.5);
         text-align: right;
     }
+
 
 </style>
