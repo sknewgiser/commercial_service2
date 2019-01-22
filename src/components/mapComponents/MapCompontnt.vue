@@ -14,7 +14,7 @@
             <div class="map-position-bg"></div>
         </div>
         <div class="map-basemap">
-            <van-icon name="bars" size="24px" />
+            <van-icon name="bars" size="24px"/>
         </div>
         <div id="map">
 
@@ -28,9 +28,8 @@
     import 'geohey-javascript-sdk/dist/lib/g-canvas.min.js'        // canvas模块
     import 'geohey-javascript-sdk/dist/lib/g-cluster.min.js'    // 样式
 
-    const LOCATION_RES = 16.777314267822266;
+    const LOCATION_RES = 16.777314267822266
     export default {
-
         mounted: function () {
             this.map = new G.Map('map', {
                 wrap: false,
@@ -47,24 +46,12 @@
                 cluster: ['a', 'b', 'c']
             });
             tileLayer.addTo(this.map);
-
-
-            // 聚类
-            // this.graphicLayer = new G.Layer.Graphic();
-            // this.graphicLayer.addTo(this.map);
+            this.map.bind('click', this.onMapClicked)
+            //加图层
+            this.graphicLayer = new G.Layer.Graphic();
+            this.graphicLayer.addTo(this.map);
             // this.graphicLayer.bringToTop();
-            // this.graphicLayer.addListener('graphicClicked', this.onGraphicClicked);
-
-
-            // this.clusterLayer = new G.Layer.Cluster({
-            //     clusterClickable: true,
-            //     pointClickable: true,
-            //     breakValues: [3, 5, 10]
-            // });
-            // this.clusterLayer.addTo(this.map);
-            // this.clusterLayer.addListener('clusterClicked', this.onClusterClicked);		
-            // this.map.redraw();
-
+            this.graphicLayer.addListener('graphicClicked', this.onGraphicClicked);
 
             // 边界
             const AK = 'MjdiNzliMDYxZTY4NGM5MWI5YjNkYzUyYWE1YjRlMjk';
@@ -87,7 +74,7 @@
                         "blendingMode": "src-over",
                         "fillColor": "#ffffff",
                         "fillOpacity": 0,
-                        "outlineColor": "#9b9b9b",
+                        "outlineColor": "#2C3E50",
                         "outlineOpacity": 0.6,
                         "outlineWidth": 1
                     }
@@ -115,7 +102,14 @@
                     }
                 }
             ];
-            axios.get('http://geohey.com/s/dataviz/config?ak=MjdiNzliMDYxZTY4NGM5MWI5YjNkYzUyYWE1YjRlMjk&configJson=' + escape(JSON.stringify(Config_JZ)))
+            // axios.get('http://geohey.com/s/dataviz/config?ak=MjdiNzliMDYxZTY4NGM5MWI5YjNkYzUyYWE1YjRlMjk&configJson=' + escape(JSON.stringify(Config_JZ)))
+            axios.get('http://geohey.com/s/dataviz/config', {
+                // axios.get('/api',{
+                params: {
+                    ak: 'MjdiNzliMDYxZTY4NGM5MWI5YjNkYzUyYWE1YjRlMjk',
+                    configJson: JSON.stringify(Config_JZ)
+                }
+            })
                 .then(res => {
                     const url = "http://geohey.com/s/dataviz/" + res.data.data.vizId
                         + '/{z}/{x}/{y}.png?ak=' + AK + '&retina=@2x&useCache=false';
@@ -130,6 +124,16 @@
                     console.log(err)
                 })
 
+            // 聚类
+            // this.clusterLayer = new G.Layer.Cluster({
+            //     clusterClickable: true,
+            //     pointClickable: true,
+            //     breakValues: [3, 5, 10]
+            // });
+            // this.clusterLayer.addTo(this.map);  //加入到地图中
+            // this.clusterLayer.addListener('clusterClicked', this.onClusterClicked);
+            // this.map.redraw();
+
         },
         created: function () {
             //获取当前的category
@@ -138,20 +142,28 @@
         },
 
         methods: {
-            addPoi: function (r) {
+            addPoi: function (r, {color}) {
+                // console.log(r)
                 let webmercator = G.Proj.WebMercator.project(r.lon, r.lat);
+                // console.log(webmercator)
                 let g = new G.Graphic.Point([webmercator[0], webmercator[1]], r, {
                     shape: 'circle',
-                    size: [5, 5],
+                    size: [10, 10],
                     offset: [0, 0],
-                    fillColor: '#5b709b',
+                    fillColor: color,
                     clickable: true
                 });
+                // console.log(g)
                 g.addTo(this.graphicLayer, r.id, true);
                 // this.clusterLayer.addPoint(g);
             },
             onGraphicClicked(e) {
                 let g = e.graphic;
+                //先关闭之前点击的点
+                this.endEdit();
+                //再显示当前点击的点
+                this.startEdit(g);
+
                 let anchorPoint = g.geom;
                 this.zoomToLocation(anchorPoint);
                 let contenthtml = this.getPopupHtml(g.attrs);
@@ -163,14 +175,28 @@
                 this.showAttrs[category - 1].forEach(key => {
                     html += `<p> <span>${key[0]}:</span><span>${obj[key[1]]}</span></p>`
                 })
-                console.log(obj)
-                console.log(html)
-                // let html = '<table class="tab_list_bd"><tbody>' +
-                //     '<tr"><td  style="white-space:nowrap">' + obj.name + '</td></tr>' +
-                //     '</tbody></table>';
-
-
                 return html;
+            },
+            onMapClicked() {
+                this.endEdit();
+            },
+            endEdit() { //关闭所有点亮的点
+                const graphics = this.graphicLayer.all();
+                for (var g in graphics) {
+                    if (graphics[g].isEditing()) {
+                        graphics[g].endEdit();
+                        this.map.hidePopup();
+                    }
+                }
+            },
+            startEdit(g) { //点亮当前的点
+                if (!g.isEditing()) {
+                    g.startEdit({
+                        vertexFillColor:this.$store.state.selectColors[this.$route.params.category - 1],
+                        vertexColor:this.$store.state.selectColors[this.$route.params.category - 1],
+                        vertexDashArray:[0,0]
+                    });
+                }
             },
             zoomIn() {
                 if (this.map) {
@@ -185,6 +211,10 @@
             showPopup(item) {
                 //1、从graphiclayer图层中获取graphic
                 let g = this.graphicLayer.get(item.id);
+                //先关闭之前点亮的点
+                this.endEdit();
+                //再高亮显示当前点击的点
+                this.startEdit(g);
                 //显示popup
                 let anchorPoint = g.geom;
                 this.zoomToLocation(anchorPoint);
@@ -197,8 +227,12 @@
                     this.map.zoomRes(newLocation, LOCATION_RES);
                     this.map.update();
                 }
+            },
+            onClusterClicked(e) {
+                console.log(e)
+                var c = e.cluster;
+                this.clusterLayer.diveIn(c);
             }
-
         },
         computed: {
             business() {
@@ -208,9 +242,11 @@
         watch: {
             business(newVal, oldVal) {
                 if (newVal.length > 0) {
+                    // 获取颜色参数
+                    const color = this.$store.state.iconColors[this.$route.params.category - 1];
                     for (let i = 0; i < newVal.length; i++) {
                         let r = newVal[i];
-                        this.addPoi(r);
+                        this.addPoi(r, {color: color});
                     }
                 }
             }
@@ -237,8 +273,8 @@
 <style scoped lang="scss">
     $iconWidth: 36px;
     $iconHeight: 36px;
-    $borderRadius:4px;
-    $boxShadow:0 0 5px rgba(0, 0, 0, .2);
+    $borderRadius: 4px;
+    $boxShadow: 0 0 5px rgba(0, 0, 0, .2);
     #map {
         background: #233;
         height: 100%;
@@ -248,11 +284,13 @@
         right: 0;
         bottom: 0;
     }
+
     .map-box {
         position: relative;
         height: calc(100% - 1rem);
         overflow: hidden;
     }
+
     .map-tool {
         position: absolute;
         left: 10px;
@@ -260,6 +298,7 @@
         z-index: 1;
 
     }
+
     .zoom {
         background: #fff;
         width: 36px;
@@ -270,6 +309,7 @@
         margin-top: 10px;
         border-radius: $borderRadius;
     }
+
     .zoom-in-icon, .zoom-out-icon {
         background-image: url("../../assets/images/mapZoom2x.png");
         width: 10px;
@@ -277,19 +317,24 @@
         margin: 12px auto;
         background-size: cover;
     }
+
     .zoom-in-icon {
         background-position: 0 0;
     }
+
     .zoom-out-icon {
         background-position: -10px 2px;
     }
+
     .map-box /deep/ .g-popup-content-wrapper {
         width: 42.5vw;
     }
+
     .map-box /deep/ .van-pagination__item, .map-box /deep/ .van-pagination__page-desc {
         height: 0.8rem;
         line-height: 0.8rem;
     }
+
     .map-position {
         position: absolute;
         left: 10px;
@@ -301,6 +346,7 @@
         box-shadow: $boxShadow;
         background-color: #fff;
     }
+
     .map-position-bg {
         background-image: url("../../assets/images/map-icons.png"); /*  图片宽高比   1 ： 3   */
         background-position: 0 0;
@@ -310,6 +356,7 @@
         height: 26px;
         margin: 5px auto;
     }
+
     .map-basemap {
         position: absolute;
         right: 10px;

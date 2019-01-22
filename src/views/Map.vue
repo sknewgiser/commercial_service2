@@ -79,7 +79,7 @@
         beforeRouteEnter (to, from, next) {
             next( vm =>{
                 vm.$store.commit('updateShowReturnBtn',true)
-                console.log(vm.$store.state.bgColors[to.params.category -1])
+                // console.log(vm.$store.state.bgColors[to.params.category -1])
                 vm.$store.commit('updateTitleBg',vm.$store.state.bgColors[to.params.category -1])
             });
             // 在渲染该组件的对应路由被 confirm 前调用
