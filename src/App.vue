@@ -162,6 +162,11 @@
         margin-right: 10px;
 
     }
-
+    #app /deep/ .mint-header-title {
+        font-size: 15px;
+        margin-top: 1px;
+        line-height: 16px;
+        height: 16px;
+    }
 
 </style>

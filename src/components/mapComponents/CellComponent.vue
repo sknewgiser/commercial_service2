@@ -5,7 +5,7 @@
         </p>
         <div v-show="pageBusiness.length>0">
             <ul class="pageBusiness-items">
-                <li v-for="(item,index) in pageBusiness" class="cell-item" :key="item.id"
+                <li v-for="(item) in pageBusiness" class="cell-item" :key="item.id"
                     @click="businessHandleClick(item)">
                     <!--<span class="cell-item-index" v-text="index+1"></span>-->
                     <div class="cell-item-name" >

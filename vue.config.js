@@ -46,13 +46,16 @@ const Config_JZ = [
 ];
 
 module.exports = {
-    devServer:{
-        proxy:{
-            "/api":{
-                target:'http://geohey.com',
+    publicPath: process.env.NODE_ENV === 'production'
+        ? '/commercial_service/'
+        : '/',
+    devServer: {
+        proxy: {
+            "/api": {
+                target: 'http://geohey.com',
                 ws: false,
                 changeOrigin: true,
-                pathRewrite:{
+                pathRewrite: {
                     '/api': `/s/dataviz/config?ak=MjdiNzliMDYxZTY4NGM5MWI5YjNkYzUyYWE1YjRlMjk&configJson=${escape(JSON.stringify(Config_JZ))}`
                 }
             }

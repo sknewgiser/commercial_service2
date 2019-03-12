@@ -125,14 +125,14 @@
                 })
 
             // 聚类
-            // this.clusterLayer = new G.Layer.Cluster({
-            //     clusterClickable: true,
-            //     pointClickable: true,
-            //     breakValues: [3, 5, 10]
-            // });
-            // this.clusterLayer.addTo(this.map);  //加入到地图中
-            // this.clusterLayer.addListener('clusterClicked', this.onClusterClicked);
-            // this.map.redraw();
+            this.clusterLayer = new G.Layer.Cluster({
+                clusterClickable: true,
+                pointClickable: true,
+                breakValues: [3, 5, 10]
+            });
+            this.clusterLayer.addTo(this.map);  //加入到地图中
+            this.clusterLayer.addListener('clusterClicked', this.onClusterClicked);
+            this.map.redraw();
 
         },
         created: function () {
@@ -154,8 +154,8 @@
                     clickable: true
                 });
                 // console.log(g)
-                g.addTo(this.graphicLayer, r.id, true);
-                // this.clusterLayer.addPoint(g);
+                //g.addTo(this.graphicLayer, r.id, true);
+                this.clusterLayer.addPoint(g);
             },
             onGraphicClicked(e) {
                 let g = e.graphic;
@@ -183,14 +183,14 @@
             endEdit() { //关闭所有点亮的点
                 const graphics = this.graphicLayer.all();
                 for (var g in graphics) {
-                    if (graphics[g].isEditing()) {
+                    if (graphics[g].isEditing && graphics[g].isEditing()) {
                         graphics[g].endEdit();
                         this.map.hidePopup();
                     }
                 }
             },
             startEdit(g) { //点亮当前的点
-                if (!g.isEditing()) {
+                if (g.isEditing && !g.isEditing()) {
                     g.startEdit({
                         vertexFillColor:this.$store.state.selectColors[this.$route.params.category - 1],
                         vertexColor:this.$store.state.selectColors[this.$route.params.category - 1],
@@ -210,7 +210,9 @@
             },
             showPopup(item) {
                 //1、从graphiclayer图层中获取graphic
+                console.log(item)
                 let g = this.graphicLayer.get(item.id);
+                console.log(g)
                 //先关闭之前点亮的点
                 this.endEdit();
                 //再高亮显示当前点击的点
@@ -232,6 +234,7 @@
                 console.log(e)
                 var c = e.cluster;
                 this.clusterLayer.diveIn(c);
+                console.log(c.showRealRes)
             }
         },
         computed: {
@@ -240,7 +243,7 @@
             }
         },
         watch: {
-            business(newVal, oldVal) {
+            business(newVal) {
                 if (newVal.length > 0) {
                     // 获取颜色参数
                     const color = this.$store.state.iconColors[this.$route.params.category - 1];
