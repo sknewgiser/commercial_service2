@@ -160,15 +160,18 @@
             },
             onGraphicClicked(e) {
                 let g = e.graphic;
-                //先关闭之前点击的点
-                this.endEdit();
-                //再显示当前点击的点
-                this.startEdit(g);
+                if(g.attrs.name!=undefined){
+                    //先关闭之前点击的点
+                    this.endEdit();
+                    //再显示当前点击的点
+                    this.startEdit(g);
 
-                let anchorPoint = g.geom;
-                this.zoomToLocation(anchorPoint);
-                let contenthtml = this.getPopupHtml(g.attrs);
-                this.map.showPopup(anchorPoint, contenthtml);
+                    let anchorPoint = g.geom;
+                    this.zoomToLocation(anchorPoint);
+                    let contenthtml = this.getPopupHtml(g.attrs);
+                    this.map.showPopup(anchorPoint, contenthtml);
+                }
+
             },
             getPopupHtml(obj) {
                 const category = this.$route.params.category;
