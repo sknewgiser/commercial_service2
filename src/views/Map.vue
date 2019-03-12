@@ -26,7 +26,7 @@
         },
         methods: {
             clickBusiness(item) {
-               this.$refs.mapComponent.showPopup(item)
+               this.$refs.mapComponent.showPopup2(item)
             },
             initData(){
                 this.category = this.$route.params.category;
